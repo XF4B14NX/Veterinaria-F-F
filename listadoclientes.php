@@ -1,3 +1,10 @@
+<?php
+// 1. ¡Incluimos al "guardia" de Admin!
+include 'php/verificar_sesion_admin.php';
+
+// 2. Incluimos la conexión a la BD
+include 'php/conexiones.php';
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -215,33 +222,29 @@
     </style>
 </head>
 <body>
-
     <div class="admin-wrapper">
-        
         <aside class="sidebar">
-            <div class="sidebar-logo">
-                F&F Admin
-            </div>
+            <div class="sidebar-logo">F&F Admin</div>
             <nav class="sidebar-nav">
                 <a href="#"><i data-feather="calendar"></i> Mant. Citas</a>
-                <a href="#" class="active"><i data-feather="users"></i> Listado Clientes</a>
+                <a href="listadoclientes.php" class="active"><i data-feather="users"></i> Listado Clientes</a>
                 <a href="#"><i data-feather="file-text"></i> Mant. Fichas Clínicas</a>
                 <a href="#"><i data-feather="briefcase"></i> Mant. Personal</a>
                 <a href="#"><i data-feather="settings"></i> Configuración</a>
                 <a href="#"><i data-feather="bar-chart-2"></i> Reportes</a>
-                <a href="Autores.html"><i data-feather="info"></i> Autor</a>
+                <a href="Autores.php"><i data-feather="info"></i> Autor</a>
             </nav>
             <div class="sidebar-footer">
-                <a href="#"><i data-feather="log-out"></i> Cerrar Sesión</a>
+                <a href="php/logout.php"><i data-feather="log-out"></i> Cerrar Sesión</a>
             </div>
         </aside>
 
         <main class="main-content">
-            <h2>Listado Clientes</h2>
+            <h2>Listado Clientes (¡Hola, <?php echo htmlspecialchars($nombre_personal_logueado . " - " . $rol_personal_logueado); ?>!)</h2>
             
             <div class="actions-header">
                 <input type="text" placeholder="Buscar cliente por nombre o RUT (Búsqueda por PK)...">
-                <a href="#" class="btn-add">Añadir Cliente</a>
+                <a href="crear_usuario.php" class="btn-add">Añadir Cliente</a>
             </div>
 
             <div class="card">
@@ -253,42 +256,48 @@
                                 <th>RUT</th>
                                 <th>Correo</th>
                                 <th>Teléfono</th>
-                                <th>Mascotas</th>
+                                <th>Mascotas (Ítem 16)</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Juan Pérez</td>
-                                <td>12.345.678-9</td>
-                                <td>cliente@mail.com</td>
-                                <td>+56 9 1234 5678</td>
-                                <td>2</td>
-                                <td>
-                                    <a href="#" class="action-modify">Modificar</a>
-                                    <a href="#" class="action-delete">Eliminar</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Ana González</td>
-                                <td>9.876.543-2</td>
-                                <td>ana@mail.com</td>
-                                <td>+56 9 8765 4321</td>
-                                <td>1</td>
-                                <td>
-                                    <a href="#" class="action-modify">Modificar</a>
-                                    <a href="#" class="action-delete">Eliminar</a>
-                                </td>
-                            </tr>
-                            </tbody>
+                            <?php
+                            // --- CAMBIO 4: INICIO LECTURA LISTADO (Ítem 7) ---
+                            $sql_listado = "SELECT * FROM propietarios";
+                            $resultado_listado = mysqli_query($conexion, $sql_listado);
+
+                            if (mysqli_num_rows($resultado_listado) > 0) {
+                                // Itera y muestra clientes reales
+                                while ($cliente = mysqli_fetch_assoc($resultado_listado)) {
+                                    echo "<tr>";
+                                    echo "<td>" . htmlspecialchars($cliente['nombre']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($cliente['rut']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($cliente['correo']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($cliente['numero']) . "</td>";
+                                    
+                                    // (Ítem 16: Muestra N° de registros / Ítem 5: Cálculo)
+                                    $sql_count = "SELECT COUNT(*) as total FROM mascotas WHERE propietario_id = " . $cliente['propietario_id'];
+                                    $res_count = mysqli_query($conexion, $sql_count);
+                                    $count = mysqli_fetch_assoc($res_count)['total'];
+                                    echo "<td>" . $count . "</td>";
+
+                                    echo '<td>';
+                                    echo '<a href="#" class="action-modify">Modificar</a>'; // (Ítem 18)
+                                    echo '<a href="#" class="action-delete">Eliminar</a>'; // (Ítem 19)
+                                    echo '</td>';
+                                    echo "</tr>";
+                                }
+                            } else {
+                                echo '<tr><td colspan="6">No hay clientes registrados.</td></tr>';
+                            }
+                            mysqli_close($conexion);
+                            ?>
+                        </tbody>
                     </table>
                 </div>
             </div>
         </main>
     </div>
-
-    <script>
-        feather.replace();
-    </script>
+    <script> feather.replace(); </script>
 </body>
 </html>

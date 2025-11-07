@@ -1,3 +1,7 @@
+<?php
+// 1. ¡Incluimos al "guardia" de Admin!
+include 'php/verificar_sesion_admin.php';
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -149,48 +153,39 @@
     </style>
 </head>
 <body>
-
     <div class="admin-wrapper">
         <aside class="sidebar">
-            <div class="sidebar-logo">
-                F&F Admin
-            </div>
+            <div class="sidebar-logo"> F&F Admin </div>
             <nav class="sidebar-nav">
                 <a href="#"><i data-feather="calendar"></i> Mant. Citas</a>
-                <a href="listadoclientes.html"><i data-feather="users"></i> Listado Clientes</a>
+                <a href="listadoclientes.php"><i data-feather="users"></i> Listado Clientes</a>
                 <a href="#"><i data-feather="file-text"></i> Mant. Fichas Clínicas</a>
                 <a href="#"><i data-feather="briefcase"></i> Mant. Personal</a>
                 <a href="#"><i data-feather="settings"></i> Configuración</a>
                 <a href="#"><i data-feather="bar-chart-2"></i> Reportes</a>
-                <a href="#" class="active"><i data-feather="info"></i> Autores</a>
+                <a href="Autores.php" class="active"><i data-feather="info"></i> Autores</a>
             </nav>
             <div class="sidebar-footer">
-                <a href="Login.html"><i data-feather="log-out"></i> Cerrar Sesión</a>
+                <a href="php/logout.php"><i data-feather="log-out"></i> Cerrar Sesión</a>
             </div>
         </aside>
-
         <main class="main-content">
             <h2>Autores del Proyecto</h2>
             <div class="authors-grid">
-                
                 <div class="author-card">
                     <img src="" alt="Foto de Fabian">
                     <h3>Fabian Jara Sanchez</h3>
                     <p>.............</p>
                 </div>
-                
                 <div class="author-card">
                     <img src="" alt="Foto de Fernanda">
                     <h3>Fernanda Aguirre Saez</h3>
                     <p>.............</p>
                 </div>
-                
             </div>
         </main>
     </div>
-
     <script>
-        // Inicializa Feather Icons
         feather.replace();
     </script>
 </body>

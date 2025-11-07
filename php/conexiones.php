@@ -1,10 +1,10 @@
 <?php
 
 // 1. Definimos los 4 parámetros de conexión
-$servidor = "localhost";    // Tu servidor local (XAMPP)
-$usuario = "root";          // El usuario por defecto de XAMPP
-$password = "";             // La contraseña por defecto de XAMPP (vacía)
-$nombre_bd = "veterinaria_db"; // El nombre de la BD que Fernanda creó
+$servidor = "localhost";\
+$usuario = "root";\
+$password = "";\
+$nombre_bd = "veterinaria_db";\
 
 // 2. Creamos la conexión usando mysqli_connect
 $conexion = mysqli_connect($servidor, $usuario, $password, $nombre_bd);

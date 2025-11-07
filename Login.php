@@ -1,6 +1,4 @@
 <?php
-// 1. Iniciamos la sesión
-// Esto es necesario para poder recibir y mostrar mensajes de error.
 session_start();
 ?>
 <!DOCTYPE html>
@@ -106,35 +104,21 @@ session_start();
         <p>Un clic más cerca de tus pacientes peludos: ingresa a la Agenda Veterinaria</p>
         
         <?php
-        // 2. Si el backend (validar_login.php) nos envió un error, lo mostramos aquí.
         if (isset($_SESSION['error_login'])) {
-            echo '<div class="error-message">' . $_SESSION['error_login'] . '</div>';
-            // 3. Borramos el error de la sesión para que no se muestre de nuevo
+            echo '<div class="error-message">' . htmlspecialchars($_SESSION['error_login']) . '</div>';
             unset($_SESSION['error_login']);
         }
         ?>
 
-
-        <form action="validar_login.php" method="POST">
+        <form action="php/validar_login.php" method="POST">
             <div class="form-group">
                 <label for="usuario">Usuario</label>
-                <input 
-                    type="text" 
-                    id="usuario" 
-                    name="usuario" 
-                    required
-                    placeholder="Ingresa tu usuario">
+                <input type="text" id="usuario" name="usuario" required placeholder="Ingresa tu usuario">
             </div>
             <div class="form-group">
                 <label for="password">Contraseña</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    required
-                    placeholder="Ingresa tu contraseña">
+                <input type="password" id="password" name="password" required placeholder="Ingresa tu contraseña">
             </div>
-
             <button type="submit">Entrar</button>
         </form>
 

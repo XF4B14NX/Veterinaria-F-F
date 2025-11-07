@@ -1,10 +1,8 @@
 <?php
-// 1. Incluimos el "corazón" de nuestro backend: la conexión
 include 'conexiones.php';
 
 /*
  * 2. Verificamos que los datos se hayan enviado por POST
- * (method="POST" es la forma correcta de enviar formularios)
  */
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
@@ -17,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $usuario = mysqli_real_escape_string($conexion, $_POST['usuario']);
     $password = $_POST['password']; // No escapamos la contraseña todavía
 
-    // 4. ¡CRÍTICO! Encriptar la contraseña (JAMÁS guardes contraseñas en texto plano)
+    // 4. Encriptar la contraseña 
     // Esto cumple con la Factibilidad Legal
     $password_encriptada = password_hash($password, PASSWORD_DEFAULT);
 
