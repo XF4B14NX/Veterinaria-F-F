@@ -61,6 +61,49 @@ include 'php/conexiones.php';
              color: #2196F3; text-decoration: none; font-weight: 500; font-size: 14px; }
         .cita-item {
              background-color: #f9f9f9; padding: 15px; border-radius: 4px; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .modal-content {
+            background-color: #ffffff;
+            margin: 15% auto;
+            padding: 30px;
+            border: 1px solid #888;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-button:hover { color: #333; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: #555; font-weight: 500; font-size: 16px; }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            font-family: 'Roboto', sans-serif;
+            color: #333;
+            background-color: #f9f9f9;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
@@ -69,7 +112,6 @@ include 'php/conexiones.php';
         <div class="nav-left">
             <a href="perfil_cliente.php" class="nav-logo">F&F</a>
             <div class="nav-links">
-                <!-- CAMBIO: Enlaces corregidos -->
                 <a href="perfil_cliente.php" class="active">Mi Perfil</a>
                 <a href="mis_mascotas.php">Mis Mascotas</a>
                 <a href="agendar_cita.php">Agendar Cita</a>
@@ -87,7 +129,7 @@ include 'php/conexiones.php';
         <div class="card">
             <div class="info-header">
                 <h3>Información del Dueño (RF-002)</h3>
-                <button>Editar mi información</button>
+                <button id="btnEditarPerfil">Editar mi información</button>
             </div>
             <?php
             // --- LECTURA DATOS DUEÑO (RF-002) ---
@@ -113,7 +155,6 @@ include 'php/conexiones.php';
                 <ul>
                     <?php
                     // --- LECTURA MASCOTAS (RF-003) ---
-                    // CAMBIO 1: Ahora también pedimos 'mascota_id'
                     $sql_mascotas = "SELECT mascota_id, nombre, especie, raza FROM mascotas WHERE propietario_id = ?";
                     $stmt_mascotas = mysqli_prepare($conexion, $sql_mascotas);
                     mysqli_stmt_bind_param($stmt_mascotas, "i", $id_usuario_logueado);
@@ -125,7 +166,6 @@ include 'php/conexiones.php';
                             $icono = (strtolower($mascota['especie']) == 'perro') ? '🐶' : '🐱';
                             echo '<li class="mascota-item">';
                             echo '<span>' . $icono . ' ' . htmlspecialchars($mascota['nombre']) . ' (' . htmlspecialchars($mascota['especie']) . ', ' . htmlspecialchars($mascota['raza']) . ')</span>';
-                            // CAMBIO 2: El enlace ahora apunta a la nueva página y pasa el ID
                             echo '<a href="mis_mascotas.php?id=' . $mascota['mascota_id'] . '">Ver Ficha (RF-004)</a>';
                             echo '</li>';
                         }
@@ -158,7 +198,6 @@ include 'php/conexiones.php';
                             echo '<p><strong>Mascota:</strong> ' . htmlspecialchars($cita['nombre_mascota']) . '</p>';
                             echo '<p><strong>Servicio:</strong> ' . htmlspecialchars($cita['nombre_servicio']) . '</p>';
                             echo '<p><strong>Fecha:</strong> ' . $fecha_formateada . '</p>';
-                            // CAMBIO 3: Enlace para cancelar (RF-006)
                             echo '<a href="php/procesar_cita.php?accion=cancelar&id=' . $cita['cita_id'] . '" style="color: #f44336; font-size: 14px; text-decoration: none;" onclick="return confirm(\'¿Estás seguro de que deseas cancelar esta cita?\');">Cancelar Cita</a>';
                             echo '</li>';
                         }
@@ -170,5 +209,49 @@ include 'php/conexiones.php';
             </div>
         </div>
     </div> 
+
+    <div id="modalEditar" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModal">&times;</span>
+            <h3>Editar mi Información (RF-002)</h3>
+            <br>
+            <form action="php/actualizar_perfil_cliente.php" method="POST">
+                <div class="form-group">
+                    <label for="correo">Correo Electrónico:</label>
+                    <input type="email" id="correo" name="correo" value="<?php echo htmlspecialchars($dueño['correo']); ?>" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefono">Teléfono:</label>
+                    <input type="tel" id="telefono" name="telefono" value="<?php echo htmlspecialchars($dueño['numero']); ?>" required>
+                </div>
+                <button type="submit">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Obtenemos los elementos
+        var modal = document.getElementById("modalEditar");
+        var btn = document.getElementById("btnEditarPerfil");
+        var span = document.getElementById("closeModal");
+
+        // Cuando el usuario hace clic en el botón, abre el modal
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        // Cuando el usuario hace clic en (x), cierra el modal
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // Cuando el usuario hace clic fuera del modal, lo cierra
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+
 </body>
 </html>
