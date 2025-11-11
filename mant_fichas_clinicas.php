@@ -81,9 +81,6 @@ else if (isset($_GET['mascota_id']) && is_numeric($_GET['mascota_id'])) {
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/feather-icons"></script>
     <style>
-        /* (Pega aquí TODO el CSS de listadoclientes.php) */
-        /* ... */
-        /* (Añade estos estilos extra para los formularios y la ficha) */
         body {
             font-family: 'Roboto', sans-serif; margin: 0; background-color: #f0f2f5; color: #333333; }
         .admin-wrapper {
@@ -158,15 +155,15 @@ else if (isset($_GET['mascota_id']) && is_numeric($_GET['mascota_id'])) {
         
         <aside class="sidebar">
             <div class="sidebar-logo">F&F Admin</div>
-            <nav class="sidebar-nav">
-                <a href="#"><i data-feather="calendar"></i> Mant. Citas</a>
-                <a href="listadoclientes.php"><i data-feather="users"></i> Listado Clientes</a>
-                <a href="mant_fichas_clinicas.php" class="active"><i data-feather="file-text"></i> Mant. Fichas Clínicas</a>
-                <a href="#"><i data-feather="briefcase"></i> Mant. Personal</a>
-                <a href="#"><i data-feather="settings"></i> Configuración</a>
-                <a href="#"><i data-feather="bar-chart-2"></i> Reportes</a>
-                <a href="Autores.php"><i data-feather="info"></i> Autor</a>
-            </nav>
+  <nav class="sidebar-nav">
+    <a href="mant_citas.php"><i data-feather="calendar"></i> Mant. Citas</a> 
+    <a href="listadoclientes.php"><i data-feather="users"></i> Listado Clientes</a>
+    <a href="mant_fichas_clinicas.php" class="active"><i data-feather="file-text"></i> Mant. Fichas Clínicas</a>
+    <a href="#"><i data-feather="briefcase"></i> Mant. Personal</a>
+    <a href="#"><i data-feather="settings"></i> Configuración</a>
+    <a href="#"><i data-feather="bar-chart-2"></i> Reportes</a>
+    <a href="Autores.php"><i data-feather="info"></i> Autor</a>
+</nav>
             <div class="sidebar-footer">
                 <a href="php/logout.php"><i data-feather="log-out"></i> Cerrar Sesión</a>
             </div>

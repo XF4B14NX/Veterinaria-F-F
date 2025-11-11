@@ -41,7 +41,7 @@ while ($fila = mysqli_fetch_assoc($resultado_servicios)) {
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/feather-icons"></script>
     <style>
-        /* (Pega aquí TODO el CSS de listadoclientes.php) */
+        /* (Todo tu CSS va aquí) */
         body {
             font-family: 'Roboto', sans-serif; margin: 0; background-color: #f0f2f5; color: #333333; }
         .admin-wrapper {
@@ -92,7 +92,6 @@ while ($fila = mysqli_fetch_assoc($resultado_servicios)) {
             padding: 12px 22px; background-color: #64b8fc; color: #ffffff; border: none; border-radius: 4px; font-size: 16px; font-weight: 500; cursor: pointer; text-decoration: none; transition: background-color 0.3s ease; }
         .btn-add:hover {
             background-color: #8fc1ea; }
-        /* (Estilos para el Modal, copiados de perfil_cliente.php) */
         .modal {
             display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.4); }
         .modal-content {
@@ -116,6 +115,7 @@ while ($fila = mysqli_fetch_assoc($resultado_servicios)) {
         
         <aside class="sidebar">
             <div class="sidebar-logo">F&F Admin</div>
+            <!-- INICIO DE NAVEGACIÓN CORREGIDA -->
             <nav class="sidebar-nav">
                 <a href="mant_citas.php" class="active"><i data-feather="calendar"></i> Mant. Citas</a>
                 <a href="listadoclientes.php"><i data-feather="users"></i> Listado Clientes</a>
@@ -125,6 +125,7 @@ while ($fila = mysqli_fetch_assoc($resultado_servicios)) {
                 <a href="#"><i data-feather="bar-chart-2"></i> Reportes</a>
                 <a href="Autores.php"><i data-feather="info"></i> Autor</a>
             </nav>
+            <!-- FIN DE NAVEGACIÓN CORREGIDA -->
             <div class="sidebar-footer">
                 <a href="php/logout.php"><i data-feather="log-out"></i> Cerrar Sesión</a>
             </div>
@@ -133,10 +134,11 @@ while ($fila = mysqli_fetch_assoc($resultado_servicios)) {
         <main class="main-content">
             <h2>Gestión de Citas (RF-007)</h2>
 
+            <!-- (El resto del código HTML y PHP va aquí...) -->
             <div class="actions-header">
                 <button id="btnNuevaCita" class="btn-add">Agendar Cita (Telefónica)</button>
             </div>
-
+            
             <div class="card">
                 <div class="table-wrapper">
                     <table>
@@ -175,8 +177,6 @@ while ($fila = mysqli_fetch_assoc($resultado_servicios)) {
                                     echo "<td>" . htmlspecialchars($cita['nombre_servicio']) . "</td>";
                                     echo "<td>" . htmlspecialchars($cita['estado']) . "</td>";
                                     echo '<td>';
-                                    // 4. Creamos el enlace para cancelar (RF-007)
-                                    // Solo mostramos "Cancelar" si la cita no está ya cancelada o completada
                                     if ($cita['estado'] == 'Programada') {
                                         echo '<a href="php/admin_procesar_cita.php?accion=cancelar&id=' . $cita['cita_id'] . '" class="action-delete" onclick="return confirm(\'¿Estás seguro de cancelar esta cita?\');">Cancelar</a>';
                                     } else {
@@ -197,6 +197,7 @@ while ($fila = mysqli_fetch_assoc($resultado_servicios)) {
         </main>
     </div>
 
+    <!-- (El Modal HTML va aquí...) -->
     <div id="modalAgendar" class="modal">
         <div class="modal-content">
             <span class="close-button" id="closeModal">&times;</span>
@@ -237,9 +238,9 @@ while ($fila = mysqli_fetch_assoc($resultado_servicios)) {
             </form>
         </div>
     </div>
-
+    
+    <!-- (El JavaScript va aquí...) -->
     <script>
-        // 5. JavaScript para el modal (igual que en perfil_cliente.php)
         feather.replace();
 
         var modal = document.getElementById("modalAgendar");

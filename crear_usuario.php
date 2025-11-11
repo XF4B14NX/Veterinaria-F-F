@@ -33,7 +33,7 @@
         input[type="email"],
         input[type="password"],
         input[type="tel"] {
-            width: 100%;
+            wiaadth: 100%;
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -108,7 +108,7 @@
         </form>
 
         <div class="back-to-login">
-            ¿Ya tienes cuenta? <a href="login.php">Inicia sesión aquí</a>
+            ¿Ya tienes cuenta? <a href="Login.Php">Inicia sesión aquí</a>
         </div>
     </div>
 </body>

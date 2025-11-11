@@ -12,7 +12,25 @@ if (isset($_GET['accion'])) {
         // 3. Obtenemos los datos del formulario de agendar_cita.php
         $mascota_id = $_POST['mascota_id'];
         $servicio_id = $_POST['servicio_id'];
-        $fecha_hora = $_POST['fecha_hora'];
+        
+        // --- CAMBIO AQUÍ ---
+        // Recibimos fecha y hora por separado
+        $fecha = $_POST['fecha'];
+        $hora = $_POST['hora'];
+        
+        // Verificamos que la hora no esté vacía (por si el JS falla)
+        if (empty($fecha) || empty($hora)) {
+             echo "<script>
+                    alert('Error: Debes seleccionar una fecha y una hora válidas.');
+                    window.location.href = '../agendar_cita.php';
+                  </script>";
+             exit();
+        }
+        
+        // Los unimos en un formato DATETIME para la BD (ej: "2025-11-12 10:30:00")
+        $fecha_hora = $fecha . ' ' . $hora . ':00';
+        // --- FIN DEL CAMBIO ---
+        
         
         // 4. Verificamos que la mascota le pertenezca al usuario logueado
         $sql_verificar = "SELECT propietario_id FROM mascotas WHERE mascota_id = ? AND propietario_id = ?";
@@ -35,7 +53,7 @@ if (isset($_GET['accion'])) {
                       </script>";
             } else {
                 echo "<script>
-                        alert('Error al agendar la cita. Inténtelo de nuevo.');
+                        alert('Error al agendar la cita. Es posible que esa hora ya no esté disponible.');
                         window.location.href = '../agendar_cita.php';
                       </script>";
             }
@@ -55,8 +73,7 @@ if (isset($_GET['accion'])) {
         
         $cita_id = $_GET['id'];
 
-        // 3.Verificamos que la cita le pertenezca al usuario logueado
-        // (Verificamos que el 'propietario_id' de la mascota de la cita sea el del usuario)
+        // (Esta parte de cancelar no necesita cambios)
         $sql_verificar = "SELECT c.cita_id FROM citas c
                           JOIN mascotas m ON c.mascota_id = m.mascota_id
                           WHERE c.cita_id = ? AND m.propietario_id = ?";
@@ -67,7 +84,6 @@ if (isset($_GET['accion'])) {
         $resultado_verificar = mysqli_stmt_get_result($stmt_verificar);
 
         if (mysqli_num_rows($resultado_verificar) == 1) {
-            // 4. La cita es del usuario. Procedemos a "cancelar" (actualizar estado)
             $sql_cancelar = "UPDATE citas SET estado = 'Cancelada' WHERE cita_id = ?";
             $stmt_cancelar = mysqli_prepare($conexion, $sql_cancelar);
             mysqli_stmt_bind_param($stmt_cancelar, "i", $cita_id);
@@ -85,7 +101,6 @@ if (isset($_GET['accion'])) {
             }
             mysqli_stmt_close($stmt_cancelar);
         } else {
-            // 5. Error de seguridad: Intento de cancelar cita ajena.
             echo "<script>
                     alert('Error: No tienes permisos sobre esta cita.');
                     window.location.href = '../perfil_cliente.php';
@@ -95,7 +110,6 @@ if (isset($_GET['accion'])) {
     }
 
 } else {
-    // Si alguien entra al script sin una acción, lo echamos.
     header("Location: ../perfil_cliente.php");
     exit();
 }
