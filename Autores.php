@@ -156,14 +156,27 @@ include 'php/verificar_sesion_admin.php';
     <div class="admin-wrapper">
         <aside class="sidebar">
             <div class="sidebar-logo"> F&F Admin </div>
+            
             <nav class="sidebar-nav">
-                <a href="#"><i data-feather="calendar"></i> Mant. Citas</a>
-                <a href="listadoclientes.php"><i data-feather="users"></i> Listado Clientes</a>
-                <a href="#"><i data-feather="file-text"></i> Mant. Fichas Clínicas</a>
-                <a href="#"><i data-feather="briefcase"></i> Mant. Personal</a>
-                <a href="#"><i data-feather="settings"></i> Configuración</a>
-                <a href="#"><i data-feather="bar-chart-2"></i> Reportes</a>
-                <a href="Autores.php" class="active"><i data-feather="info"></i> Autores</a>
+                <a href="mant_citas.php" class="<?php echo (basename($_SERVER['PHP_SELF']) == 'mant_citas.php') ? 'active' : ''; ?>">
+                    <i data-feather="calendar"></i> Mant. Citas
+                </a>
+                <a href="listadoclientes.php" class="<?php echo (basename($_SERVER['PHP_SELF']) == 'listadoclientes.php') ? 'active' : ''; ?>">
+                    <i data-feather="users"></i> Listado Clientes
+                </a>
+                <a href="mant_fichas_clinicas.php" class="<?php echo (basename($_SERVER['PHP_SELF']) == 'mant_fichas_clinicas.php') ? 'active' : ''; ?>">
+                    <i data-feather="file-text"></i> Mant. Fichas Clínicas
+                </a>
+                
+                <?php if ($rol_personal_logueado == 'Administrador'): ?>
+                    <a href="#"><i data-feather="briefcase"></i> Mant. Personal</a>
+                    <a href="#"><i data-feather="settings"></i> Configuración</a>
+                    <a href="#"><i data-feather="bar-chart-2"></i> Reportes</a>
+                <?php endif; ?>
+                
+                <a href="Autores.php" class="<?php echo (basename($_SERVER['PHP_SELF']) == 'Autores.php') ? 'active' : ''; ?>">
+                    <i data-feather="info"></i> Autor
+                </a>
             </nav>
             <div class="sidebar-footer">
                 <a href="php/logout.php"><i data-feather="log-out"></i> Cerrar Sesión</a>

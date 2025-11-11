@@ -12,7 +12,6 @@ include 'php/conexiones.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listado clientes - F&F Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    
     <script src="https://unpkg.com/feather-icons"></script>
     
     <style>
@@ -225,14 +224,27 @@ include 'php/conexiones.php';
     <div class="admin-wrapper">
         <aside class="sidebar">
             <div class="sidebar-logo">F&F Admin</div>
+            
             <nav class="sidebar-nav">
-                <a href="#"><i data-feather="calendar"></i> Mant. Citas</a>
-                <a href="listadoclientes.php" class="active"><i data-feather="users"></i> Listado Clientes</a>
-                <a href="#"><i data-feather="file-text"></i> Mant. Fichas Clínicas</a>
-                <a href="#"><i data-feather="briefcase"></i> Mant. Personal</a>
-                <a href="#"><i data-feather="settings"></i> Configuración</a>
-                <a href="#"><i data-feather="bar-chart-2"></i> Reportes</a>
-                <a href="Autores.php"><i data-feather="info"></i> Autor</a>
+                <a href="mant_citas.php" class="<?php echo (basename($_SERVER['PHP_SELF']) == 'mant_citas.php') ? 'active' : ''; ?>">
+                    <i data-feather="calendar"></i> Mant. Citas
+                </a>
+                <a href="listadoclientes.php" class="<?php echo (basename($_SERVER['PHP_SELF']) == 'listadoclientes.php') ? 'active' : ''; ?>">
+                    <i data-feather="users"></i> Listado Clientes
+                </a>
+                <a href="mant_fichas_clinicas.php" class="<?php echo (basename($_SERVER['PHP_SELF']) == 'mant_fichas_clinicas.php') ? 'active' : ''; ?>">
+                    <i data-feather="file-text"></i> Mant. Fichas Clínicas
+                </a>
+                
+                <?php if ($rol_personal_logueado == 'Administrador'): ?>
+                    <a href="#"><i data-feather="briefcase"></i> Mant. Personal</a>
+                    <a href="#"><i data-feather="settings"></i> Configuración</a>
+                    <a href="#"><i data-feather="bar-chart-2"></i> Reportes</a>
+                <?php endif; ?>
+                
+                <a href="Autores.php" class="<?php echo (basename($_SERVER['PHP_SELF']) == 'Autores.php') ? 'active' : ''; ?>">
+                    <i data-feather="info"></i> Autor
+                </a>
             </nav>
             <div class="sidebar-footer">
                 <a href="php/logout.php"><i data-feather="log-out"></i> Cerrar Sesión</a>
@@ -256,18 +268,17 @@ include 'php/conexiones.php';
                                 <th>RUT</th>
                                 <th>Correo</th>
                                 <th>Teléfono</th>
-                                <th>Mascotas (Ítem 16)</th>
+                                <th>Mascotas</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
-                            // --- CAMBIO 4: INICIO LECTURA LISTADO (Ítem 7) ---
+                            // (El código PHP para llenar la tabla va aquí...)
                             $sql_listado = "SELECT * FROM propietarios";
                             $resultado_listado = mysqli_query($conexion, $sql_listado);
 
                             if (mysqli_num_rows($resultado_listado) > 0) {
-                                // Itera y muestra clientes reales
                                 while ($cliente = mysqli_fetch_assoc($resultado_listado)) {
                                     echo "<tr>";
                                     echo "<td>" . htmlspecialchars($cliente['nombre']) . "</td>";
@@ -275,15 +286,18 @@ include 'php/conexiones.php';
                                     echo "<td>" . htmlspecialchars($cliente['correo']) . "</td>";
                                     echo "<td>" . htmlspecialchars($cliente['numero']) . "</td>";
                                     
-                                    // (Ítem 16: Muestra N° de registros / Ítem 5: Cálculo)
-                                    $sql_count = "SELECT COUNT(*) as total FROM mascotas WHERE propietario_id = " . $cliente['propietario_id'];
-                                    $res_count = mysqli_query($conexion, $sql_count);
-                                    $count = mysqli_fetch_assoc($res_count)['total'];
+                                    // Cálculo de mascotas
+                                    $sql_count_mascotas = "SELECT COUNT(*) as total FROM mascotas WHERE propietario_id = ?";
+                                    $stmt_count = mysqli_prepare($conexion, $sql_count_mascotas);
+                                    mysqli_stmt_bind_param($stmt_count, "i", $cliente['propietario_id']);
+                                    mysqli_stmt_execute($stmt_count);
+                                    $count = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_count))['total'];
                                     echo "<td>" . $count . "</td>";
+                                    mysqli_stmt_close($stmt_count);
 
                                     echo '<td>';
-                                    echo '<a href="#" class="action-modify">Modificar</a>'; // (Ítem 18)
-                                    echo '<a href="#" class="action-delete">Eliminar</a>'; // (Ítem 19)
+                                    echo '<a href="#" class="action-modify">Modificar</a>'; 
+                                    echo '<a href="#" class="action-delete">Eliminar</a>'; 
                                     echo '</td>';
                                     echo "</tr>";
                                 }

@@ -108,7 +108,7 @@
         </form>
 
         <div class="back-to-login">
-            ¿Ya tienes cuenta? <a href="Login.Php">Inicia sesión aquí</a>
+            ¿Ya tienes cuenta? <a href="Login.php">Inicia sesión aquí</a>
         </div>
     </div>
 </body>

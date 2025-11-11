@@ -10,11 +10,9 @@ $mascota_seleccionada = null;
 $historial = [];
 
 // 3. Lógica de Búsqueda (RF-010)
-// Si se busca por RUT...
 if (isset($_GET['rut']) && !empty($_GET['rut'])) {
     $rut_buscado = mysqli_real_escape_string($conexion, $_GET['rut']);
     
-    // Buscamos al dueño
     $sql_dueño = "SELECT * FROM propietarios WHERE rut = ?";
     $stmt_dueño = mysqli_prepare($conexion, $sql_dueño);
     mysqli_stmt_bind_param($stmt_dueño, "s", $rut_buscado);
@@ -23,7 +21,6 @@ if (isset($_GET['rut']) && !empty($_GET['rut'])) {
     
     if (mysqli_num_rows($resultado_dueño) == 1) {
         $dueño = mysqli_fetch_assoc($resultado_dueño);
-        // Si encontramos al dueño, buscamos sus mascotas
         $sql_mascotas = "SELECT * FROM mascotas WHERE propietario_id = ?";
         $stmt_mascotas = mysqli_prepare($conexion, $sql_mascotas);
         mysqli_stmt_bind_param($stmt_mascotas, "i", $dueño['propietario_id']);
@@ -36,11 +33,9 @@ if (isset($_GET['rut']) && !empty($_GET['rut'])) {
     }
     mysqli_stmt_close($stmt_dueño);
 } 
-// Si se selecciona una mascota directamente...
 else if (isset($_GET['mascota_id']) && is_numeric($_GET['mascota_id'])) {
     $id_mascota_buscada = $_GET['mascota_id'];
     
-    // Buscamos la mascota
     $sql_mascota = "SELECT * FROM mascotas WHERE mascota_id = ?";
     $stmt_mascota = mysqli_prepare($conexion, $sql_mascota);
     mysqli_stmt_bind_param($stmt_mascota, "i", $id_mascota_buscada);
@@ -50,7 +45,6 @@ else if (isset($_GET['mascota_id']) && is_numeric($_GET['mascota_id'])) {
     if (mysqli_num_rows($resultado_mascota) == 1) {
         $mascota_seleccionada = mysqli_fetch_assoc($resultado_mascota);
         
-        // Buscamos al dueño de esa mascota
         $sql_dueño_mascota = "SELECT * FROM propietarios WHERE propietario_id = ?";
         $stmt_dueño_mascota = mysqli_prepare($conexion, $sql_dueño_mascota);
         mysqli_stmt_bind_param($stmt_dueño_mascota, "i", $mascota_seleccionada['propietario_id']);
@@ -58,7 +52,6 @@ else if (isset($_GET['mascota_id']) && is_numeric($_GET['mascota_id'])) {
         $dueño = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_dueño_mascota));
         mysqli_stmt_close($stmt_dueño_mascota);
 
-        // Si encontramos la mascota, cargamos su historial (RF-011)
         $sql_historial = "SELECT * FROM historial_vacunas WHERE mascota_id = ? ORDER BY fecha DESC";
         $stmt_historial = mysqli_prepare($conexion, $sql_historial);
         mysqli_stmt_bind_param($stmt_historial, "i", $id_mascota_buscada);
@@ -150,20 +143,31 @@ else if (isset($_GET['mascota_id']) && is_numeric($_GET['mascota_id'])) {
     </style>
 </head>
 <body>
-
     <div class="admin-wrapper">
-        
         <aside class="sidebar">
             <div class="sidebar-logo">F&F Admin</div>
-  <nav class="sidebar-nav">
-    <a href="mant_citas.php"><i data-feather="calendar"></i> Mant. Citas</a> 
-    <a href="listadoclientes.php"><i data-feather="users"></i> Listado Clientes</a>
-    <a href="mant_fichas_clinicas.php" class="active"><i data-feather="file-text"></i> Mant. Fichas Clínicas</a>
-    <a href="#"><i data-feather="briefcase"></i> Mant. Personal</a>
-    <a href="#"><i data-feather="settings"></i> Configuración</a>
-    <a href="#"><i data-feather="bar-chart-2"></i> Reportes</a>
-    <a href="Autores.php"><i data-feather="info"></i> Autor</a>
-</nav>
+
+            <nav class="sidebar-nav">
+                <a href="mant_citas.php" class="<?php echo (basename($_SERVER['PHP_SELF']) == 'mant_citas.php') ? 'active' : ''; ?>">
+                    <i data-feather="calendar"></i> Mant. Citas
+                </a>
+                <a href="listadoclientes.php" class="<?php echo (basename($_SERVER['PHP_SELF']) == 'listadoclientes.php') ? 'active' : ''; ?>">
+                    <i data-feather="users"></i> Listado Clientes
+                </a>
+                <a href="mant_fichas_clinicas.php" class="<?php echo (basename($_SERVER['PHP_SELF']) == 'mant_fichas_clinicas.php') ? 'active' : ''; ?>">
+                    <i data-feather="file-text"></i> Mant. Fichas Clínicas
+                </a>
+                
+                <?php if ($rol_personal_logueado == 'Administrador'): ?>
+                    <a href="#"><i data-feather="briefcase"></i> Mant. Personal</a>
+                    <a href="#"><i data-feather="settings"></i> Configuración</a>
+                    <a href="#"><i data-feather="bar-chart-2"></i> Reportes</a>
+                <?php endif; ?>
+                
+                <a href="Autores.php" class="<?php echo (basename($_SERVER['PHP_SELF']) == 'Autores.php') ? 'active' : ''; ?>">
+                    <i data-feather="info"></i> Autor
+                </a>
+            </nav>
             <div class="sidebar-footer">
                 <a href="php/logout.php"><i data-feather="log-out"></i> Cerrar Sesión</a>
             </div>
@@ -187,11 +191,9 @@ else if (isset($_GET['mascota_id']) && is_numeric($_GET['mascota_id'])) {
                 </div>
             </div>
 
-            <?php if ($dueño && !$mascota_seleccionada): // Si buscamos un RUT y encontramos dueño, pero aún no elegimos mascota ?>
+            <?php if ($dueño && !$mascota_seleccionada): ?>
             <div class="card">
-                <div class="card-header">
-                    <h3>2. Seleccionar Mascota</h3>
-                </div>
+                <div class="card-header"><h3>2. Seleccionar Mascota</h3></div>
                 <div class="card-body search-results">
                     <h4>Dueño: <?php echo htmlspecialchars($dueño['nombre']); ?></h4>
                     <?php if (!empty($mascotas)): ?>
@@ -213,40 +215,31 @@ else if (isset($_GET['mascota_id']) && is_numeric($_GET['mascota_id'])) {
             </div>
             <?php endif; ?>
 
-            <?php if ($mascota_seleccionada): // Si ya seleccionamos una mascota ?>
+            <?php if ($mascota_seleccionada): ?>
             <div class="grid-ficha">
                 <div class="card">
-                    <div class="card-header">
-                        <h3>Añadir a Ficha (RF-012)</h3>
-                    </div>
+                    <div class="card-header"><h3>Añadir a Ficha (RF-012)</h3></div>
                     <div class="card-body">
                         <form action="php/crear_entrada_ficha.php" method="POST">
                             <input type="hidden" name="mascota_id" value="<?php echo $mascota_seleccionada['mascota_id']; ?>">
-                            
                             <div class="form-group">
                                 <label for="fecha">Fecha</label>
                                 <input type="date" id="fecha" name="fecha" value="<?php echo date('Y-m-d'); ?>" required>
                             </div>
-                            
                             <div class="form-group">
                                 <label for="nombre_procedimiento">Procedimiento / Vacuna</label>
                                 <input type="text" id="nombre_procedimiento" name="nombre_procedimiento" placeholder="Ej: Vacuna Óctuple, Consulta" required>
                             </div>
-                            
                             <div class="form-group">
                                 <label for="observaciones">Observaciones / Diagnóstico</label>
                                 <textarea id="observaciones" name="observaciones" rows="4" placeholder="Paciente presenta..."></textarea>
                             </div>
-                            
                             <button type="submit">Guardar en Ficha</button>
                         </form>
                     </div>
                 </div>
-
                 <div class="card">
-                    <div class="card-header">
-                        <h3>Historial de <?php echo htmlspecialchars($mascota_seleccionada['nombre']); ?> (RF-011)</h3>
-                    </div>
+                    <div class="card-header"><h3>Historial de <?php echo htmlspecialchars($mascota_seleccionada['nombre']); ?> (RF-011)</h3></div>
                     <div class="card-body">
                         <p class="info-p"><strong>Dueño:</strong> <?php echo htmlspecialchars($dueño['nombre']); ?></p>
                         <p class="info-p"><strong>Especie:</strong> <?php echo htmlspecialchars($mascota_seleccionada['especie']); ?></p>
@@ -286,9 +279,6 @@ else if (isset($_GET['mascota_id']) && is_numeric($_GET['mascota_id'])) {
 
         </main>
     </div>
-
-    <script>
-        feather.replace();
-    </script>
+    <script> feather.replace(); </script>
 </body>
 </html>

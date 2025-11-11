@@ -3,17 +3,9 @@
 include 'php/verificar_sesion_admin.php';
 include 'php/conexiones.php';
 
-// 2. Pre-cargamos TODOS los clientes, mascotas y servicios para los dropdowns del modal
-$clientes = [];
+// 2. Pre-cargamos TODOS los clientes, mascotas y servicios
 $mascotas = [];
 $servicios = [];
-
-// Cargar Clientes
-$sql_clientes = "SELECT propietario_id, nombre, rut FROM propietarios ORDER BY nombre ASC";
-$resultado_clientes = mysqli_query($conexion, $sql_clientes);
-while ($fila = mysqli_fetch_assoc($resultado_clientes)) {
-    $clientes[] = $fila;
-}
 
 // Cargar Mascotas (con el nombre del dueño)
 $sql_mascotas = "SELECT m.mascota_id, m.nombre, p.nombre as nombre_dueño 
@@ -111,21 +103,33 @@ while ($fila = mysqli_fetch_assoc($resultado_servicios)) {
 </head>
 <body>
 
+</head>
+<body>
     <div class="admin-wrapper">
-        
         <aside class="sidebar">
             <div class="sidebar-logo">F&F Admin</div>
-            <!-- INICIO DE NAVEGACIÓN CORREGIDA -->
+            
             <nav class="sidebar-nav">
-                <a href="mant_citas.php" class="active"><i data-feather="calendar"></i> Mant. Citas</a>
-                <a href="listadoclientes.php"><i data-feather="users"></i> Listado Clientes</a>
-                <a href="mant_fichas_clinicas.php"><i data-feather="file-text"></i> Mant. Fichas Clínicas</a>
-                <a href="#"><i data-feather="briefcase"></i> Mant. Personal</a>
-                <a href="#"><i data-feather="settings"></i> Configuración</a>
-                <a href="#"><i data-feather="bar-chart-2"></i> Reportes</a>
-                <a href="Autores.php"><i data-feather="info"></i> Autor</a>
+                <a href="mant_citas.php" class="<?php echo (basename($_SERVER['PHP_SELF']) == 'mant_citas.php') ? 'active' : ''; ?>">
+                    <i data-feather="calendar"></i> Mant. Citas
+                </a>
+                <a href="listadoclientes.php" class="<?php echo (basename($_SERVER['PHP_SELF']) == 'listadoclientes.php') ? 'active' : ''; ?>">
+                    <i data-feather="users"></i> Listado Clientes
+                </a>
+                <a href="mant_fichas_clinicas.php" class="<?php echo (basename($_SERVER['PHP_SELF']) == 'mant_fichas_clinicas.php') ? 'active' : ''; ?>">
+                    <i data-feather="file-text"></i> Mant. Fichas Clínicas
+                </a>
+                
+                <?php if ($rol_personal_logueado == 'Administrador'): ?>
+                    <a href="#"><i data-feather="briefcase"></i> Mant. Personal</a>
+                    <a href="#"><i data-feather="settings"></i> Configuración</a>
+                    <a href="#"><i data-feather="bar-chart-2"></i> Reportes</a>
+                <?php endif; ?>
+                
+                <a href="Autores.php" class="<?php echo (basename($_SERVER['PHP_SELF']) == 'Autores.php') ? 'active' : ''; ?>">
+                    <i data-feather="info"></i> Autor
+                </a>
             </nav>
-            <!-- FIN DE NAVEGACIÓN CORREGIDA -->
             <div class="sidebar-footer">
                 <a href="php/logout.php"><i data-feather="log-out"></i> Cerrar Sesión</a>
             </div>
@@ -133,8 +137,7 @@ while ($fila = mysqli_fetch_assoc($resultado_servicios)) {
 
         <main class="main-content">
             <h2>Gestión de Citas (RF-007)</h2>
-
-            <!-- (El resto del código HTML y PHP va aquí...) -->
+            
             <div class="actions-header">
                 <button id="btnNuevaCita" class="btn-add">Agendar Cita (Telefónica)</button>
             </div>
@@ -154,7 +157,6 @@ while ($fila = mysqli_fetch_assoc($resultado_servicios)) {
                         </thead>
                         <tbody>
                             <?php
-                            // 3. Leemos TODAS las citas de la BD (RF-007)
                             $sql_citas = "SELECT c.cita_id, c.fecha_hora, c.estado, 
                                                  p.nombre as nombre_dueño, 
                                                  m.nombre as nombre_mascota, 
@@ -197,14 +199,12 @@ while ($fila = mysqli_fetch_assoc($resultado_servicios)) {
         </main>
     </div>
 
-    <!-- (El Modal HTML va aquí...) -->
     <div id="modalAgendar" class="modal">
         <div class="modal-content">
             <span class="close-button" id="closeModal">&times;</span>
             <h3>Agendar Cita Telefónica</h3>
             <br>
             <form action="php/admin_procesar_cita.php?accion=agendar" method="POST">
-                
                 <div class="form-group">
                     <label for="mascota">1. Selecciona la mascota</label>
                     <select id="mascota" name="mascota_id" required>
@@ -216,7 +216,6 @@ while ($fila = mysqli_fetch_assoc($resultado_servicios)) {
                         ?>
                     </select>
                 </div>
-
                 <div class="form-group">
                     <label for="servicio">2. Selecciona el servicio</label>
                     <select id="servicio" name="servicio_id" required>
@@ -228,31 +227,22 @@ while ($fila = mysqli_fetch_assoc($resultado_servicios)) {
                         ?>
                     </select>
                 </div>
-
                 <div class="form-group">
                     <label for="fecha_hora">3. Selecciona la fecha y hora</label>
                     <input type="datetime-local" id="fecha_hora" name="fecha_hora" required min="<?php echo date('Y-m-d\TH:i'); ?>">
                 </div>
-
                 <button type="submit" style="width: 100%;">Confirmar Cita</button>
             </form>
         </div>
     </div>
     
-    <!-- (El JavaScript va aquí...) -->
     <script>
         feather.replace();
-
         var modal = document.getElementById("modalAgendar");
         var btn = document.getElementById("btnNuevaCita");
         var span = document.getElementById("closeModal");
-
-        btn.onclick = function() {
-            modal.style.display = "block";
-        }
-        span.onclick = function() {
-            modal.style.display = "none";
-        }
+        btn.onclick = function() { modal.style.display = "block"; }
+        span.onclick = function() { modal.style.display = "none"; }
         window.onclick = function(event) {
             if (event.target == modal) {
                 modal.style.display = "none";
